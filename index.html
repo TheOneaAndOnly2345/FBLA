@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Career Simulator - Level 1: Janitor</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    #game-ui {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #score-panel {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%);
+      padding: 20px 40px;
+      border-radius: 30px;
+      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4),
+                  inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+      animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: translateX(-50%) scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: translateX(-50%) scale(1.1);
+      }
+      100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    #score-content {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      color: white;
+      font-weight: 700;
+      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      font-family: 'Bubblegum Sans', cursive;
+    }
+
+    #timer-bar {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
+      border: 3px solid white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4ECDC4 0%, #44A08D 100%);
+      transition: width 0.3s ease;
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+
+    #combo-display {
+      position: absolute;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      background: linear-gradient(135deg, #FEC163 0%, #DE4313 100%);
+      padding: 15px 30px;
+      border-radius: 20px;
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+      box-shadow: 0 5px 20px rgba(254, 193, 99, 0.6);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      font-family: 'Bubblegum Sans', cursive;
+    }
+
+    #combo-display.active {
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
+
+    #controls-info {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border-radius: 15px;
+      color: white;
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .control-item {
+      margin: 5px 0;
+    }
+
+    .key {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-weight: 700;
+      margin-right: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    #level-complete {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      pointer-events: auto;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #level-complete.active {
+      display: flex;
+    }
+
+    .complete-title {
+      font-size: 72px;
+      color: white;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+      animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      font-family: 'Bubblegum Sans', cursive;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    .complete-stats {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 30px 50px;
+      border-radius: 20px;
+      margin-top: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .complete-stat {
+      font-size: 24px;
+      color: white;
+      margin: 10px 0;
+    }
+
+    #action-prompt {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px 30px;
+      border-radius: 15px;
+      color: white;
+      font-size: 18px;
+      border: 3px solid #4ECDC4;
+      box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
+      animation: pulse 1.5s infinite;
+      pointer-events: none;
+      display: none;
+      font-weight: 700;
+    }
+
+    #action-prompt.active {
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translateX(-50%) scale(1.05);
+        opacity: 0.8;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-ui">
+    <div id="score-panel">
+      <div id="score-content">
+        <div class="stat">
+          <div class="stat-label">Cleaned</div>
+          <div class="stat-value" id="items-cleaned">0/20</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Time</div>
+          <div class="stat-value" id="time-display">120s</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Combo</div>
+          <div class="stat-value" id="combo-value">x1</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="timer-bar">
+      <div id="timer-fill"></div>
+    </div>
+
+    <div id="combo-display">🔥 COMBO x<span id="combo-text">2</span>!</div>
+
+    <div id="action-prompt">Press <span class="key">E</span></div>
+
+    <div id="controls-info">
+      <div class="control-item"><span class="key">WASD</span> Move</div>
+      <div class="control-item"><span class="key">E</span> Clean Trash</div>
+      <div class="control-item"><span class="key">HOLD E</span> Mop Spills</div>
+    </div>
+
+    <div id="level-complete">
+      <div class="complete-title">🎉 LEVEL COMPLETE! 🎉</div>
+      <div class="complete-stats">
+        <div class="complete-stat">Items Cleaned: <span id="final-items">0</span></div>
+        <div class="complete-stat">Time Remaining: <span id="final-time">0</span>s</div>
+        <div class="complete-stat">Max Combo: <span id="final-combo">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <a-scene>
+    <!-- Green Sky for outdoor feel -->
+    <a-sky color="#87CEEB"></a-sky>
+
+    <!-- Lighting -->
+    <a-light type="ambient" intensity="0.8" color="#FFF5E6"></a-light>
+    <a-light type="directional" position="15 25 10" intensity="0.5" color="#FFF8DC"></a-light>
+
+    <!-- Static Camera -->
+    <a-entity id="camera-rig" position="0 50 0">
+      <a-camera id="camera" position="0 0 0" rotation="-90 0 0" look-controls="enabled: false" wasd-controls="enabled: false" fov="100"></a-camera>
+    </a-entity>
+
+    <!-- Player (BIGGER - 1.5x) -->
+    <a-entity id="player" position="0 0 0" player-controller>
+      <a-cylinder position="0 1.8 0" radius="0.9" height="3.6" color="#00CED1"></a-cylinder>
+      <a-sphere position="0 4.2 0" radius="1.05" color="#FFD700"></a-sphere>
+      <a-sphere position="0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
+      <a-sphere position="-0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
+      <a-torus position="0 3.9 0.9" radius="0.36" radius-tubular="0.06" rotation="0 0 0" color="#000000" segments-tubular="6" arc="180"></a-torus>
+      <a-cylinder position="1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
+      <a-cylinder position="-1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
+      <a-cylinder position="0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
+      <a-cylinder position="-0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
+      <a-entity position="1.8 1.8 0.6" rotation="0 0 -30">
+        <a-cylinder radius="0.075" height="3.6" color="#8B4513"></a-cylinder>
+        <a-box position="0 -1.95 0" width="1.05" height="0.24" depth="0.75" color="#F0F0F0"></a-box>
+      </a-entity>
+    </a-entity>
+
+    <!-- LUSH OUTDOOR BACKGROUND -->
+    <!-- Grass Ground (extends beyond office) -->
+    <a-plane position="0 -0.1 0" rotation="-90 0 0" width="200" height="200" color="#2ECC71"></a-plane>
+
+    <!-- Trees around the office -->
+    <a-entity position="-60 0 -60">
+      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+    </a-entity>
+
+    <a-entity position="60 0 -60">
+      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+    </a-entity>
+
+    <a-entity position="-60 0 60">
+      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+    </a-entity>
+
+    <a-entity position="60 0 60">
+      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+    </a-entity>
+
+    <!-- Bushes scattered around -->
+    <a-sphere position="-55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
+    <a-sphere position="55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
+    <a-sphere position="-55 1 30" radius="2" color="#3FBF3F"></a-sphere>
+    <a-sphere position="55 1 30" radius="2" color="#3FBF3F"></a-sphere>
+    <a-sphere position="-50 1 0" radius="2" color="#3FBF3F"></a-sphere>
+    <a-sphere position="50 1 0" radius="2" color="#3FBF3F"></a-sphere>
+
+    <!-- More decorative trees -->
+    <a-entity position="-70 0 0">
+      <a-cylinder radius="1.2" height="6" color="#8B4513"></a-cylinder>
+      <a-sphere position="0 7 0" radius="4" color="#32CD32"></a-sphere>
+    </a-entity>
+
+    <a-entity position="70 0 0">
+      <a-cylinder radius="1.2" height="6" color="#8B4513"></a-cylinder>
+      <a-sphere position="0 7 0" radius="4" color="#32CD32"></a-sphere>
+    </a-entity>
+
+    <!-- OFFICE (BIGGER - 1.5x scale for furniture) -->
+    <a-entity id="office">
+      <!-- Main Floor -->
+      <a-plane position="0 0 0" rotation="-90 0 0" width="80" height="100" color="#D3D3D3" shadow="receive: true"></a-plane>
+
+      <!-- Outer Walls -->
+      <a-box position="0 3 -50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
+      <a-box position="0 3 50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
+      <a-box position="40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
+      <a-box position="-40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
+
+      <!-- Windows -->
+      <a-box position="-30 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="-20 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="-10 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="0 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="10 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="20 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+      <a-box position="30 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
+
+      <!-- Interior Walls -->
+      <a-box position="-20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
+      <a-box position="20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
+
+      <!-- Office 1 Walls -->
+      <a-box position="-30 3 -30" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
+      <a-box position="-30 3 -10" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
+      <a-box position="-39.8 3 -20" width="0.4" height="6" depth="20" color="#FF7F50"></a-box>
+      
+      <!-- Office 2 Walls -->
+      <a-box position="30 3 -30" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
+      <a-box position="30 3 -10" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
+      <a-box position="39.8 3 -20" width="0.4" height="6" depth="20" color="#E6E6FA"></a-box>
+
+      <!-- Conference Room Walls -->
+      <a-box position="0 3 20" width="30" height="6" depth="0.4" color="#87CEEB"></a-box>
+      <a-box position="-15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
+      <a-box position="15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
+
+      <!-- Break Room Walls -->
+      <a-box position="-30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
+      <a-box position="30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
+
+      <!-- Roofs -->
+      <a-plane position="-30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
+      <a-plane position="30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
+      <a-plane position="0 6 0" rotation="90 0 0" width="39" height="60" color="#FFFFFF"></a-plane>
+      <a-plane position="0 6 35" rotation="90 0 0" width="29" height="29" color="#FFFFFF"></a-plane>
+      <a-plane position="-27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
+      <a-plane position="27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
+
+      <!-- Decorations - Paintings (BIGGER 1.5x) -->
+      <a-entity position="-19.8 3.5 -25">
+        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
+        <a-box position="0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#FF6B6B"></a-box>
+      </a-entity>
+
+      <a-entity position="-19.8 3.5 -5">
+        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
+        <a-box position="0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#4ECDC4"></a-box>
+      </a-entity>
+
+      <a-entity position="19.7 3.5 -25">
+        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
+        <a-box position="-0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#FFE66D"></a-box>
+      </a-entity>
+
+      <a-entity position="19.7 3.5 -5">
+        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
+        <a-box position="-0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#95E1D3"></a-box>
+      </a-entity>
+
+      <!-- Plants (BIGGER 1.5x) -->
+      <a-entity position="-15 0 -30">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
+      </a-entity>
+
+      <a-entity position="15 0 -30">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
+      </a-entity>
+
+      <a-entity position="-15 0 5">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
+      </a-entity>
+
+      <a-entity position="15 0 5">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
+      </a-entity>
+
+      <!-- OFFICE 1 FURNITURE (BIGGER 1.5x) -->
+      <a-entity position="-28 0 -25">
+        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#DEB887"></a-box>
+        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-32 0 -25">
+        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#F4A460"></a-box>
+        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <!-- Chairs (BIGGER 1.5x) -->
+      <a-entity position="-28 0 -27.25">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FF6B6B"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#FF6B6B"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-32 0 -27.25">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#4ECDC4"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#4ECDC4"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <!-- Office 1 Plant (BIGGER 1.5x) -->
+      <a-entity position="-35 0 -15">
+        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
+        <a-sphere position="0 1.8 0" radius="1.05" color="#32CD32"></a-sphere>
+      </a-entity>
+
+      <!-- Office 1 Painting (BIGGER 1.5x) -->
+      <a-entity position="-30 3.5 -29.8">
+        <a-box width="4.5" height="3" depth="0.15" color="#8B4513"></a-box>
+        <a-box position="0 0 0.075" width="4.2" height="2.7" depth="0.075" color="#FFB6C1"></a-box>
+      </a-entity>
+
+      <!-- OFFICE 2 FURNITURE (BIGGER 1.5x) -->
+      <a-entity position="28 0 -25">
+        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#B0C4DE"></a-box>
+        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="32 0 -15">
+        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#DDA0DD"></a-box>
+        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="28 0 -27.25">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FFE66D"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#FFE66D"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="32 0 -16.5">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#95E1D3"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#95E1D3"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="35 0 -25">
+        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
+        <a-sphere position="0 1.8 0" radius="1.05" color="#00FA9A"></a-sphere>
+      </a-entity>
+
+      <a-entity position="30 3.5 -29.8">
+        <a-box width="4.5" height="3" depth="0.15" color="#8B4513"></a-box>
+        <a-box position="0 0 0.075" width="4.2" height="2.7" depth="0.075" color="#87CEEB"></a-box>
+      </a-entity>
+
+      <!-- CONFERENCE ROOM (BIGGER 1.5x) -->
+      <a-entity position="0 0 32">
+        <a-box position="0 2.25 0" width="15" height="0.375" depth="6" color="#8B4513"></a-box>
+        <a-cylinder position="6.75 1.125 2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-6.75 1.125 2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="6.75 1.125 -2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-6.75 1.125 -2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-6 0 32">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#1E90FF"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#1E90FF"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="6 0 32">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#1E90FF"></a-box>
+        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#1E90FF"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-10 0 40">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.55 0" radius-bottom="1.35" radius-top="0.3" height="3.75" color="#2E8B57"></a-cone>
+      </a-entity>
+
+      <a-entity position="10 0 40">
+        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
+        <a-cone position="0 2.55 0" radius-bottom="1.35" radius-top="0.3" height="3.75" color="#2E8B57"></a-cone>
+      </a-entity>
+
+      <!-- BREAK ROOMS (BIGGER 1.5x) -->
+      <a-entity position="-28 0 38">
+        <a-box position="0 2.25 0" width="3.75" height="0.3" depth="3.75" color="#FF6B9D"></a-box>
+        <a-cylinder position="1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="28 0 38">
+        <a-box position="0 2.25 0" width="3.75" height="0.3" depth="3.75" color="#7FFFD4"></a-box>
+        <a-cylinder position="1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+        <a-cylinder position="-1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-28 0 40.5">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FFD700"></a-box>
+        <a-box position="0 2.1 0.525" width="1.2" height="1.2" depth="0.225" color="#FFD700"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="28 0 40.5">
+        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#BA55D3"></a-box>
+        <a-box position="0 2.1 0.525" width="1.2" height="1.2" depth="0.225" color="#BA55D3"></a-box>
+        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
+      </a-entity>
+
+      <a-entity position="-33 0 42">
+        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
+        <a-sphere position="0 1.8 0" radius="1.05" color="#7CFC00"></a-sphere>
+      </a-entity>
+
+      <a-entity position="33 0 42">
+        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
+        <a-sphere position="0 1.8 0" radius="1.05" color="#ADFF2F"></a-sphere>
+      </a-entity>
+
+      <!-- Room Labels -->
+      <a-text value="OFFICE 1" position="-30 0.01 -20" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
+      <a-text value="OFFICE 2" position="30 0.01 -20" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
+      <a-text value="CONFERENCE" position="0 0.01 35" rotation="-90 0 0" color="#FF1493" align="center" width="10"></a-text>
+      <a-text value="BREAK ROOM" position="-27 0.01 40" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
+      <a-text value="BREAK ROOM" position="27 0.01 40" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    const rooms = {
+      hallway: { cameraX: 0, cameraZ: 0, minX: -19, maxX: 19, minZ: -40, maxZ: 18 },
+      office1: { cameraX: -30, cameraZ: -20, minX: -39, maxX: -20.5, minZ: -30.5, maxZ: -9.5 },
+      office2: { cameraX: 30, cameraZ: -20, minX: 20.5, maxX: 39, minZ: -30.5, maxZ: -9.5 },
+      conference: { cameraX: 0, cameraZ: 35, minX: -14, maxX: 14, minZ: 20.5, maxZ: 49 },
+      breakroom: { cameraX: 0, cameraZ: 40, minX: -39, maxX: 39, minZ: 20.5, maxZ: 49 }
+    };
+
+    let currentRoom = 'hallway';
+    let isTransitioning = false;
+
+    const gameState = {
+      itemsCleaned: 0,
+      timeRemaining: 120,
+      combo: 1,
+      maxCombo: 1,
+      comboTimer: null,
+      started: false,
+      trashCans: [],
+      spills: [],
+      nearestItem: null,
+      cleaningSpill: false,
+      spillProgress: 0
+    };
+
+    AFRAME.registerComponent('player-controller', {
+      init: function() {
+        this.moveSpeed = 0.25;
+        this.keys = {};
+        
+        window.addEventListener('keydown', (e) => {
+          this.keys[e.key.toLowerCase()] = true;
+          
+          if (e.key.toLowerCase() === 'e' && gameState.started) {
+            if (gameState.nearestItem) {
+              if (gameState.nearestItem.classList.contains('trash-can')) {
+                cleanTrash(gameState.nearestItem);
+              } else if (gameState.nearestItem.classList.contains('spill')) {
+                gameState.cleaningSpill = true;
+                const progressRing = gameState.nearestItem.querySelector('#progress-ring');
+                if (progressRing) progressRing.setAttribute('visible', 'true');
+              }
+            }
+          }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+          this.keys[e.key.toLowerCase()] = false;
+          
+          if (e.key.toLowerCase() === 'e') {
+            if (gameState.cleaningSpill && gameState.nearestItem) {
+              if (gameState.spillProgress < 1) {
+                const progressFill = gameState.nearestItem.querySelector('#progress-fill');
+                if (progressFill) progressFill.setAttribute('theta-length', '0');
+                gameState.spillProgress = 0;
+              }
+              const progressRing = gameState.nearestItem.querySelector('#progress-ring');
+              if (progressRing) progressRing.setAttribute('visible', 'false');
+            }
+            gameState.cleaningSpill = false;
+          }
+        });
+
+        gameState.started = true;
+      },
+      
+      tick: function() {
+        const position = this.el.object3D.position;
+        const rotation = this.el.object3D.rotation;
+        
+        let moveX = 0;
+        let moveZ = 0;
+        
+        if (this.keys['w']) moveZ -= 1;
+        if (this.keys['s']) moveZ += 1;
+        if (this.keys['a']) moveX -= 1;
+        if (this.keys['d']) moveX += 1;
+        
+        if (moveX !== 0 || moveZ !== 0) {
+          const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+          moveX /= length;
+          moveZ /= length;
+          
+          const newX = position.x + moveX * this.moveSpeed;
+          const newZ = position.z + moveZ * this.moveSpeed;
+          
+          if (newX > -39 && newX < 39 && newZ > -49 && newZ < 49) {
+            let canMove = true;
+            
+            // Wall collision
+            const walls = [
+              {x: -20, z: -10, width: 0.4, depth: 40},
+              {x: 20, z: -10, width: 0.4, depth: 40},
+              {x: -30, z: -30, width: 20, depth: 0.4},
+              {x: -30, z: -10, width: 20, depth: 0.4},
+              {x: -39.8, z: -20, width: 0.4, depth: 20},
+              {x: 30, z: -30, width: 20, depth: 0.4},
+              {x: 30, z: -10, width: 20, depth: 0.4},
+              {x: 39.8, z: -20, width: 0.4, depth: 20},
+              {x: 0, z: 20, width: 30, depth: 0.4},
+              {x: -15, z: 35, width: 0.4, depth: 30},
+              {x: 15, z: 35, width: 0.4, depth: 30},
+              {x: -30, z: 35, width: 0.4, depth: 30},
+              {x: 30, z: 35, width: 0.4, depth: 30}
+            ];
+            
+            walls.forEach(wall => {
+              const wallHalfW = wall.width / 2;
+              const wallHalfD = wall.depth / 2;
+              const playerRadius = 1.2;
+              
+              if (Math.abs(newX - wall.x) < wallHalfW + playerRadius &&
+                  Math.abs(newZ - wall.z) < wallHalfD + playerRadius) {
+                canMove = false;
+              }
+            });
+            
+            if (canMove) {
+              position.x = newX;
+              position.z = newZ;
+              
+              if (moveX !== 0 || moveZ !== 0) {
+                const angle = Math.atan2(moveX, moveZ);
+                rotation.y = angle;
+              }
+            }
+          }
+        }
+        
+        checkRoomTransition(position);
+        checkNearbyItems();
+        
+        if (gameState.cleaningSpill && gameState.nearestItem) {
+          updateSpillCleaning();
+        }
+      }
+    });
+
+    function checkRoomTransition(playerPos) {
+      if (isTransitioning) return;
+      
+      let newRoom = 'hallway';
+      
+      for (const [roomName, room] of Object.entries(rooms)) {
+        if (playerPos.x >= room.minX && playerPos.x <= room.maxX &&
+            playerPos.z >= room.minZ && playerPos.z <= room.maxZ) {
+          newRoom = roomName;
+          break;
+        }
+      }
+      
+      if (newRoom !== currentRoom) {
+        currentRoom = newRoom;
+        transitionCameraToRoom(newRoom);
+      }
+    }
+
+    function transitionCameraToRoom(roomName) {
+      const cameraRig = document.getElementById('camera-rig');
+      const room = rooms[roomName];
+      
+      isTransitioning = true;
+      
+      cameraRig.setAttribute('animation', {
+        property: 'position',
+        to: `${room.cameraX} 50 ${room.cameraZ}`,
+        dur: 600,
+        easing: 'easeInOutQuad'
+      });
+      
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 600);
+    }
+
+    function checkNearbyItems() {
+      const player = document.getElementById('player');
+      const playerPos = player.object3D.position;
+      
+      let nearest = null;
+      let nearestDist = 4;
+      
+      gameState.trashCans.forEach(trash => {
+        const trashPos = trash.object3D.position;
+        const dist = playerPos.distanceTo(trashPos);
+        if (dist < nearestDist) {
+          nearest = trash;
+          nearestDist = dist;
+        }
+      });
+      
+      gameState.spills.forEach(spill => {
+        const spillPos = spill.object3D.position;
+        const dist = playerPos.distanceTo(spillPos);
+        if (dist < nearestDist) {
+          nearest = spill;
+          nearestDist = dist;
+        }
+      });
+      
+      gameState.nearestItem = nearest;
+      
+      const prompt = document.getElementById('action-prompt');
+      if (nearest) {
+        prompt.classList.add('active');
+      } else {
+        prompt.classList.remove('active');
+      }
+    }
+
+    function updateSpillCleaning() {
+      gameState.spillProgress += 0.02;
+      
+      const progressFill = gameState.nearestItem.querySelector('#progress-fill');
+      if (progressFill) {
+        const angle = gameState.spillProgress * 360;
+        progressFill.setAttribute('theta-length', Math.min(angle, 360));
+      }
+      
+      if (gameState.spillProgress >= 1) {
+        cleanSpill(gameState.nearestItem);
+        gameState.cleaningSpill = false;
+        gameState.spillProgress = 0;
+      }
+    }
+
+    function cleanTrash(trashCan) {
+      trashCan.parentNode.removeChild(trashCan);
+      const index = gameState.trashCans.indexOf(trashCan);
+      if (index > -1) gameState.trashCans.splice(index, 1);
+      
+      gameState.itemsCleaned++;
+      updateCombo();
+      updateUI();
+      checkWinCondition();
+      spawnParticles(trashCan.object3D.position);
+    }
+
+    function cleanSpill(spill) {
+      spill.parentNode.removeChild(spill);
+      const index = gameState.spills.indexOf(spill);
+      if (index > -1) gameState.spills.splice(index, 1);
+      
+      gameState.itemsCleaned++;
+      gameState.nearestItem = null;
+      updateCombo();
+      updateUI();
+      checkWinCondition();
+      spawnParticles(spill.object3D.position);
+    }
+
+    function updateCombo() {
+      clearTimeout(gameState.comboTimer);
+      gameState.combo++;
+      if (gameState.combo > gameState.maxCombo) {
+        gameState.maxCombo = gameState.combo;
+      }
+      
+      if (gameState.combo > 1) {
+        showCombo();
+      }
+      
+      gameState.comboTimer = setTimeout(() => {
+        gameState.combo = 1;
+        document.getElementById('combo-display').classList.remove('active');
+      }, 3000);
+    }
+
+    function showCombo() {
+      const comboDisplay = document.getElementById('combo-display');
+      const comboText = document.getElementById('combo-text');
+      comboText.textContent = gameState.combo;
+      comboDisplay.classList.add('active');
+    }
+
+    function spawnParticles(position) {
+      const scene = document.querySelector('a-scene');
+      
+      for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('a-sphere');
+        particle.setAttribute('position', `${position.x} ${position.y + 0.5} ${position.z}`);
+        particle.setAttribute('radius', '0.35');
+        particle.setAttribute('color', ['#FFD700', '#FF6B9D', '#4ECDC4', '#FFA07A'][Math.floor(Math.random() * 4)]);
+        particle.setAttribute('material', `emissive: #FFD700; emissiveIntensity: 0.8`);
+        
+        const randomX = (Math.random() - 0.5) * 5;
+        const randomY = Math.random() * 4 + 1;
+        const randomZ = (Math.random() - 0.5) * 5;
+        
+        particle.setAttribute('animation', `property: position; to: ${position.x + randomX} ${position.y + randomY} ${position.z + randomZ}; dur: 1000; easing: easeOutQuad`);
+        particle.setAttribute('animation__fade', 'property: material.opacity; to: 0; dur: 1000');
+        
+        scene.appendChild(particle);
+        
+        setTimeout(() => {
+          if (particle.parentNode) {
+            scene.removeChild(particle);
+          }
+        }, 1000);
+      }
+    }
+
+    function spawnCleanables() {
+      const scene = document.querySelector('a-scene');
+      const office = document.querySelector('#office');
+      
+      // Trash (BIGGER 1.5x)
+      const trashPositions = [
+        [-12, 1.8, -15], [12, 1.8, -15], [-12, 1.8, 2], [12, 1.8, 2],
+        [-28, 1.8, -22], [-32, 1.8, -18], [28, 1.8, -22], [32, 1.8, -12],
+        [-8, 1.8, 28], [8, 1.8, 28], [-25, 1.8, 42], [25, 1.8, 42]
+      ];
+
+      trashPositions.forEach((pos) => {
+        const trashCan = document.createElement('a-entity');
+        trashCan.setAttribute('position', `${pos[0]} ${pos[1]} ${pos[2]}`);
+        trashCan.classList.add('trash-can');
+        
+        const body = document.createElement('a-cylinder');
+        body.setAttribute('radius', '1.05');
+        body.setAttribute('height', '3.6');
+        body.setAttribute('color', '#FF4757');
+        body.setAttribute('material', 'emissive: #FF4757; emissiveIntensity: 0.3');
+        trashCan.appendChild(body);
+
+        const top = document.createElement('a-sphere');
+        top.setAttribute('position', '0 1.5 0');
+        top.setAttribute('radius', '1.2');
+        top.setAttribute('color', '#2F3542');
+        trashCan.appendChild(top);
+
+        const glow = document.createElement('a-sphere');
+        glow.setAttribute('position', '0 3.9 0');
+        glow.setAttribute('radius', '0.54');
+        glow.setAttribute('color', '#FFD700');
+        glow.setAttribute('material', 'emissive: #FFD700; emissiveIntensity: 0.9');
+        glow.setAttribute('animation', 'property: position; to: 0 4.5 0; dur: 1000; dir: alternate; loop: true');
+        trashCan.appendChild(glow);
+
+        office.appendChild(trashCan);
+        gameState.trashCans.push(trashCan);
+      });
+
+      // Spills (BIGGER 1.5x)
+      const spillPositions = [
+        [-8, 0.03, -20], [8, 0.03, -20], [-5, 0.03, 8], [5, 0.03, 10],
+        [-30, 0.03, -23], [30, 0.03, -17], [-5, 0.03, 32], [5, 0.03, 36],
+        [-26, 0.03, 40], [26, 0.03, 43]
+      ];
+
+      spillPositions.forEach((pos) => {
+        const spill = document.createElement('a-entity');
+        spill.setAttribute('position', `${pos[0]} ${pos[1]} ${pos[2]}`);
+        spill.classList.add('spill');
+        
+        const puddle = document.createElement('a-circle');
+        puddle.setAttribute('radius', '1.8');
+        puddle.setAttribute('rotation', '-90 0 0');
+        puddle.setAttribute('color', '#00D2FF');
+        puddle.setAttribute('material', 'emissive: #00D2FF; emissiveIntensity: 0.4; opacity: 0.8; transparent: true');
+        spill.appendChild(puddle);
+
+        const progressRing = document.createElement('a-entity');
+        progressRing.setAttribute('id', 'progress-ring');
+        progressRing.setAttribute('position', '2.4 0.06 0');
+        progressRing.setAttribute('visible', 'false');
+
+        const progressBg = document.createElement('a-ring');
+        progressBg.setAttribute('radius-inner', '0.75');
+        progressBg.setAttribute('radius-outer', '1.05');
+        progressBg.setAttribute('rotation', '-90 0 0');
+        progressBg.setAttribute('color', '#2F3542');
+        progressBg.setAttribute('material', 'opacity: 0.6; transparent: true');
+        progressRing.appendChild(progressBg);
+
+        const progressFill = document.createElement('a-ring');
+        progressFill.setAttribute('id', 'progress-fill');
+        progressFill.setAttribute('position', '0 0.03 0');
+        progressFill.setAttribute('radius-inner', '0.78');
+        progressFill.setAttribute('radius-outer', '1.02');
+        progressFill.setAttribute('rotation', '-90 0 0');
+        progressFill.setAttribute('color', '#FFD700');
+        progressFill.setAttribute('material', 'emissive: #FFD700; emissiveIntensity: 0.8');
+        progressFill.setAttribute('theta-start', '0');
+        progressFill.setAttribute('theta-length', '0');
+        progressRing.appendChild(progressFill);
+
+        spill.appendChild(progressRing);
+
+        const indicator = document.createElement('a-cone');
+        indicator.setAttribute('position', '0 3 0');
+        indicator.setAttribute('radius-bottom', '0.54');
+        indicator.setAttribute('radius-top', '0.15');
+        indicator.setAttribute('height', '1.2');
+        indicator.setAttribute('color', '#FFD700');
+        indicator.setAttribute('material', 'emissive: #FFD700; emissiveIntensity: 0.8');
+        indicator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 2000; loop: true');
+        spill.appendChild(indicator);
+
+        office.appendChild(spill);
+        gameState.spills.push(spill);
+      });
+    }
+
+    function updateUI() {
+      document.getElementById('items-cleaned').textContent = `${gameState.itemsCleaned}/20`;
+      document.getElementById('time-display').textContent = `${Math.floor(gameState.timeRemaining)}s`;
+      document.getElementById('combo-value').textContent = `x${gameState.combo}`;
+      
+      const percentage = (gameState.timeRemaining / 120) * 100;
+      document.getElementById('timer-fill').style.width = percentage + '%';
+      
+      if (percentage < 25) {
+        document.getElementById('timer-fill').style.background = 'linear-gradient(90deg, #FF6B9D 0%, #FF1493 100%)';
+      }
+    }
+
+    function checkWinCondition() {
+      if (gameState.itemsCleaned >= 20) {
+        winLevel();
+      }
+    }
+
+    function winLevel() {
+      gameState.started = false;
+      document.getElementById('final-items').textContent = gameState.itemsCleaned;
+      document.getElementById('final-time').textContent = Math.floor(gameState.timeRemaining);
+      document.getElementById('final-combo').textContent = gameState.maxCombo;
+      document.getElementById('level-complete').classList.add('active');
+    }
+
+    function gameLoop() {
+      if (gameState.started && gameState.timeRemaining > 0) {
+        gameState.timeRemaining -= 0.1;
+        
+        if (gameState.timeRemaining <= 0) {
+          gameState.timeRemaining = 0;
+          gameState.started = false;
+        }
+        
+        updateUI();
+      }
+      
+      setTimeout(gameLoop, 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        spawnCleanables();
+        gameLoop();
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
