@@ -2,9 +2,10 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Career Simulator - Level 1: Janitor</title>
+  <title>Career Quest - Complete Game</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+  <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
   <style>
     * {
@@ -19,7 +20,138 @@
       font-family: 'Fredoka', sans-serif;
     }
 
-    #game-ui {
+    /* ===== TITLE SCREEN STYLES ===== */
+    #title-ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      font-family: 'Arial Black', sans-serif;
+    }
+
+    .title-container {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      animation: floatIn 1s ease-out;
+    }
+
+    .main-title {
+      font-size: 5em;
+      color: #FF00FF;
+      text-shadow:
+        4px 4px 0px #00FFFF,
+        8px 8px 0px #FFFF00,
+        12px 12px 20px rgba(0,0,0,0.5);
+      margin: 0;
+      letter-spacing: 5px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .subtitle {
+      font-size: 1.8em;
+      color: #FFFFFF;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+      margin-top: 10px;
+    }
+
+    .start-button {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: all;
+      cursor: pointer;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #FF6B35, #FF00FF);
+      color: white;
+      border: 5px solid #FFFF00;
+      padding: 25px 60px;
+      font-size: 2.5em;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+      animation: buttonBounce 1.5s ease-in-out infinite;
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 15px 40px rgba(255,255,0,0.6);
+      border-color: #00FFFF;
+    }
+
+    .instructions-box {
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid #00FFFF;
+      border-radius: 15px;
+      padding: 20px 30px;
+      color: white;
+      max-width: 600px;
+      text-align: center;
+      animation: slideUp 1.2s ease-out;
+    }
+
+    .instructions-title {
+      font-size: 1.5em;
+      color: #FFFF00;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+    }
+
+    .instructions-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin: 5px 0;
+    }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes buttonBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* ===== LEVEL 1 (JANITOR) STYLES ===== */
+    #level1-ui {
       position: absolute;
       top: 0;
       left: 0;
@@ -225,7 +357,7 @@
       font-size: 18px;
       border: 3px solid #4ECDC4;
       box-shadow: 0 0 30px rgba(78, 205, 196, 0.6);
-      animation: pulse 1.5s infinite;
+      animation: pulse2 1.5s infinite;
       pointer-events: none;
       display: none;
       font-weight: 700;
@@ -235,7 +367,7 @@
       display: block;
     }
 
-    @keyframes pulse {
+    @keyframes pulse2 {
       0%, 100% {
         transform: translateX(-50%) scale(1);
         opacity: 1;
@@ -245,10 +377,151 @@
         opacity: 0.8;
       }
     }
+
+    /* ===== LEVEL 2 (SOFTWARE ENGINEER) STYLES ===== */
+    #level2-ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .stats-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px 40px;
+      border-radius: 15px;
+      border: 3px solid #00FFFF;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #FFFF00;
+      margin-bottom: 5px;
+    }
+
+    .multiplier {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5em;
+      color: #FF00FF;
+      text-shadow: 0 0 20px #FF00FF, 3px 3px 10px rgba(0,0,0,0.8);
+      animation: pulse 0.5s ease-in-out infinite;
+    }
+
+    .lanes {
+      position: absolute;
+      bottom: 180px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+
+    .lane {
+      width: 100px;
+      height: 120px;
+      border: 4px solid;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      transition: all 0.2s;
+    }
+
+    .lane.w { border-color: #FF00FF; color: #FF00FF; }
+    .lane.a { border-color: #00FFFF; color: #00FFFF; }
+    .lane.s { border-color: #FFFF00; color: #FFFF00; }
+    .lane.d { border-color: #FF6B35; color: #FF6B35; }
+
+    .lane.active {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px currentColor;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .feedback {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4em;
+      font-weight: bold;
+      text-shadow: 0 0 20px currentColor, 4px 4px 10px rgba(0,0,0,0.8);
+      animation: feedbackPop 0.5s ease-out;
+      pointer-events: none;
+    }
+
+    .feedback.perfect { color: #00FF00; }
+    .feedback.good { color: #FFFF00; }
+    .feedback.miss { color: #FF0000; }
+
+    @keyframes feedbackPop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    .boss-warning {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5em;
+      color: #FF0000;
+      text-shadow: 0 0 40px #FF0000, 5px 5px 15px rgba(0,0,0,0.9);
+      animation: bossFlash 0.5s ease-in-out infinite;
+      z-index: 2000;
+    }
+
+    @keyframes bossFlash {
+      0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div id="game-ui">
+  <!-- ===== TITLE SCREEN UI ===== -->
+  <div id="title-ui">
+    <div class="title-container">
+      <h1 class="main-title">CAREER QUEST</h1>
+      <p class="subtitle">🎮 Explore Your Future Through Play 🎮</p>
+    </div>
+
+    <div class="start-button">
+      <button class="btn" onclick="startLevel1()">START GAME</button>
+    </div>
+
+    <div class="instructions-box">
+      <div class="instructions-title">📋 HOW TO PLAY</div>
+      <div class="instructions-text">
+        <strong>🎯 MISSION:</strong> Complete challenges in 2 career worlds<br>
+        <strong>⌨️ CONTROLS:</strong> WASD Keys + E to interact<br>
+        <strong>🏆 GOAL:</strong> Master each career's unique skills to win!
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LEVEL 1 (JANITOR) UI ===== -->
+  <div id="level1-ui" class="hidden">
     <div id="score-panel">
       <div id="score-content">
         <div class="stat">
@@ -281,7 +554,7 @@
     </div>
 
     <div id="level-complete">
-      <div class="complete-title">🎉 LEVEL COMPLETE! 🎉</div>
+      <div class="complete-title">🎉 LEVEL 1 COMPLETE! 🎉</div>
       <div class="complete-stats">
         <div class="complete-stat">Items Cleaned: <span id="final-items">0</span></div>
         <div class="complete-stat">Time Remaining: <span id="final-time">0</span>s</div>
@@ -290,359 +563,231 @@
     </div>
   </div>
 
-  <a-scene>
-    <!-- Green Sky for outdoor feel -->
-    <a-sky color="#87CEEB"></a-sky>
+  <!-- ===== LEVEL 2 (SOFTWARE ENGINEER) UI ===== -->
+  <div id="level2-ui" class="hidden">
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-label">BUGS FIXED</div>
+        <div class="stat-value" id="bugsFixed">0 / 50</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">ACCURACY</div>
+        <div class="stat-value" id="accuracy">100%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">STREAK</div>
+        <div class="stat-value" id="streak">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">TIME</div>
+        <div class="stat-value" id="timer">0s</div>
+      </div>
+    </div>
 
-    <!-- Lighting -->
-    <a-light type="ambient" intensity="0.8" color="#FFF5E6"></a-light>
-    <a-light type="directional" position="15 25 10" intensity="0.5" color="#FFF8DC"></a-light>
+    <div id="multiplier" class="multiplier hidden"></div>
 
-    <!-- Static Camera -->
-    <a-entity id="camera-rig" position="0 50 0">
-      <a-camera id="camera" position="0 0 0" rotation="-90 0 0" look-controls="enabled: false" wasd-controls="enabled: false" fov="100"></a-camera>
-    </a-entity>
+    <div class="lanes">
+      <div class="lane w" id="lane-w">W</div>
+      <div class="lane a" id="lane-a">A</div>
+      <div class="lane s" id="lane-s">S</div>
+      <div class="lane d" id="lane-d">D</div>
+    </div>
 
-    <!-- Player (BIGGER - 1.5x) -->
-    <a-entity id="player" position="0 0 0" player-controller>
-      <a-cylinder position="0 1.8 0" radius="0.9" height="3.6" color="#00CED1"></a-cylinder>
-      <a-sphere position="0 4.2 0" radius="1.05" color="#FFD700"></a-sphere>
-      <a-sphere position="0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
-      <a-sphere position="-0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
-      <a-torus position="0 3.9 0.9" radius="0.36" radius-tubular="0.06" rotation="0 0 0" color="#000000" segments-tubular="6" arc="180"></a-torus>
-      <a-cylinder position="1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
-      <a-cylinder position="-1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
-      <a-cylinder position="0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
-      <a-cylinder position="-0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
-      <a-entity position="1.8 1.8 0.6" rotation="0 0 -30">
-        <a-cylinder radius="0.075" height="3.6" color="#8B4513"></a-cylinder>
-        <a-box position="0 -1.95 0" width="1.05" height="0.24" depth="0.75" color="#F0F0F0"></a-box>
-      </a-entity>
-    </a-entity>
+    <div id="bossWarning" class="boss-warning hidden">⚠️ CRITICAL BUG! ⚠️</div>
 
-    <!-- LUSH OUTDOOR BACKGROUND -->
-    <!-- Grass Ground (extends beyond office) -->
-    <a-plane position="0 -0.1 0" rotation="-90 0 0" width="200" height="200" color="#2ECC71"></a-plane>
+    <div id="level2-complete" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; z-index: 2000;">
+      <div class="complete-title">🎉 LEVEL 2 COMPLETE! 🎉</div>
+      <div class="complete-stats">
+        <div class="complete-stat" id="level2-final-stats"></div>
+      </div>
+      <div style="font-size: 2em; color: white; margin-top: 30px;">🏆 YOU COMPLETED CAREER QUEST! 🏆</div>
+    </div>
+  </div>
 
-    <!-- Trees around the office -->
-    <a-entity position="-60 0 -60">
-      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
-      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
-    </a-entity>
-
-    <a-entity position="60 0 -60">
-      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
-      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
-    </a-entity>
-
-    <a-entity position="-60 0 60">
-      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
-      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
-    </a-entity>
-
-    <a-entity position="60 0 60">
-      <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
-      <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
-    </a-entity>
-
-    <!-- Bushes scattered around -->
-    <a-sphere position="-55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
-    <a-sphere position="55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
-    <a-sphere position="-55 1 30" radius="2" color="#3FBF3F"></a-sphere>
-    <a-sphere position="55 1 30" radius="2" color="#3FBF3F"></a-sphere>
-    <a-sphere position="-50 1 0" radius="2" color="#3FBF3F"></a-sphere>
-    <a-sphere position="50 1 0" radius="2" color="#3FBF3F"></a-sphere>
-
-    <!-- More decorative trees -->
-    <a-entity position="-70 0 0">
-      <a-cylinder radius="1.2" height="6" color="#8B4513"></a-cylinder>
-      <a-sphere position="0 7 0" radius="4" color="#32CD32"></a-sphere>
-    </a-entity>
-
-    <a-entity position="70 0 0">
-      <a-cylinder radius="1.2" height="6" color="#8B4513"></a-cylinder>
-      <a-sphere position="0 7 0" radius="4" color="#32CD32"></a-sphere>
-    </a-entity>
-
-    <!-- OFFICE (BIGGER - 1.5x scale for furniture) -->
-    <a-entity id="office">
-      <!-- Main Floor -->
-      <a-plane position="0 0 0" rotation="-90 0 0" width="80" height="100" color="#D3D3D3" shadow="receive: true"></a-plane>
-
-      <!-- Outer Walls -->
-      <a-box position="0 3 -50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
-      <a-box position="0 3 50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
-      <a-box position="40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
-      <a-box position="-40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
-
-      <!-- Windows -->
-      <a-box position="-30 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="-20 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="-10 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="0 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="10 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="20 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-      <a-box position="30 3.5 -49.8" width="5" height="2.5" depth="0.2" color="#87CEEB" material="emissive: #87CEEB; emissiveIntensity: 0.3"></a-box>
-
-      <!-- Interior Walls -->
-      <a-box position="-20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
-      <a-box position="20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
-
-      <!-- Office 1 Walls -->
-      <a-box position="-30 3 -30" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
-      <a-box position="-30 3 -10" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
-      <a-box position="-39.8 3 -20" width="0.4" height="6" depth="20" color="#FF7F50"></a-box>
+  <!-- ===== A-FRAME SCENE ===== -->
+  <a-scene id="main-scene">
+    <!-- Title Screen Scene -->
+    <a-entity id="title-scene">
+      <a-sky color="#1a0033"></a-sky>
+      <a-entity id="title-camera" camera position="0 1.6 8" look-controls="enabled: false"></a-entity>
       
-      <!-- Office 2 Walls -->
-      <a-box position="30 3 -30" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
-      <a-box position="30 3 -10" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
-      <a-box position="39.8 3 -20" width="0.4" height="6" depth="20" color="#E6E6FA"></a-box>
+      <a-light type="ambient" color="#fff" intensity="0.5"></a-light>
+      <a-light type="point" position="-3 4 2" color="#FF00FF" intensity="1.5"></a-light>
+      <a-light type="point" position="3 4 2" color="#00FFFF" intensity="1.5"></a-light>
 
-      <!-- Conference Room Walls -->
-      <a-box position="0 3 20" width="30" height="6" depth="0.4" color="#87CEEB"></a-box>
-      <a-box position="-15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
-      <a-box position="15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
-
-      <!-- Break Room Walls -->
-      <a-box position="-30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
-      <a-box position="30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
-
-      <!-- Roofs -->
-      <a-plane position="-30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
-      <a-plane position="30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
-      <a-plane position="0 6 0" rotation="90 0 0" width="39" height="60" color="#FFFFFF"></a-plane>
-      <a-plane position="0 6 35" rotation="90 0 0" width="29" height="29" color="#FFFFFF"></a-plane>
-      <a-plane position="-27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
-      <a-plane position="27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
-
-      <!-- Decorations - Paintings (BIGGER 1.5x) -->
-      <a-entity position="-19.8 3.5 -25">
-        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
-        <a-box position="0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#FF6B6B"></a-box>
+      <a-sphere position="-10 6 -20" radius="1.5" color="#FF00FF"
+        material="emissive: #FF00FF; emissiveIntensity: 0.4; opacity: 0.7"
+        animation="property: position; to: -10 7 -20; loop: true; dir: alternate; dur: 4000"></a-sphere>
+      
+      <a-entity position="-3 1.5 0">
+        <a-box width="1" height="1.5" depth="1" color="#00FFFF"
+          material="emissive: #00FFFF; emissiveIntensity: 0.4"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"></a-box>
+        <a-text value="🧹" align="center" width="6" position="0 0 0.55" color="#FFFFFF"></a-text>
       </a-entity>
 
-      <a-entity position="-19.8 3.5 -5">
-        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
-        <a-box position="0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#4ECDC4"></a-box>
+      <a-entity position="0 2 0">
+        <a-box width="1.2" height="1.8" depth="1.2" color="#FFFF00"
+          material="emissive: #FFFF00; emissiveIntensity: 0.4"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear"></a-box>
+        <a-text value="💻" align="center" width="8" position="0 0 0.65" color="#FFFFFF"></a-text>
       </a-entity>
-
-      <a-entity position="19.7 3.5 -25">
-        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
-        <a-box position="-0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#FFE66D"></a-box>
-      </a-entity>
-
-      <a-entity position="19.7 3.5 -5">
-        <a-box width="0.15" height="3" depth="3.75" color="#8B4513"></a-box>
-        <a-box position="-0.075 0 0" width="0.075" height="2.7" depth="3.45" color="#95E1D3"></a-box>
-      </a-entity>
-
-      <!-- Plants (BIGGER 1.5x) -->
-      <a-entity position="-15 0 -30">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
-      </a-entity>
-
-      <a-entity position="15 0 -30">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
-      </a-entity>
-
-      <a-entity position="-15 0 5">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
-      </a-entity>
-
-      <a-entity position="15 0 5">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.25 0" radius-bottom="1.2" radius-top="0.3" height="3" color="#228B22"></a-cone>
-      </a-entity>
-
-      <!-- OFFICE 1 FURNITURE (BIGGER 1.5x) -->
-      <a-entity position="-28 0 -25">
-        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#DEB887"></a-box>
-        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-32 0 -25">
-        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#F4A460"></a-box>
-        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <!-- Chairs (BIGGER 1.5x) -->
-      <a-entity position="-28 0 -27.25">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FF6B6B"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#FF6B6B"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-32 0 -27.25">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#4ECDC4"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#4ECDC4"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <!-- Office 1 Plant (BIGGER 1.5x) -->
-      <a-entity position="-35 0 -15">
-        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
-        <a-sphere position="0 1.8 0" radius="1.05" color="#32CD32"></a-sphere>
-      </a-entity>
-
-      <!-- Office 1 Painting (BIGGER 1.5x) -->
-      <a-entity position="-30 3.5 -29.8">
-        <a-box width="4.5" height="3" depth="0.15" color="#8B4513"></a-box>
-        <a-box position="0 0 0.075" width="4.2" height="2.7" depth="0.075" color="#FFB6C1"></a-box>
-      </a-entity>
-
-      <!-- OFFICE 2 FURNITURE (BIGGER 1.5x) -->
-      <a-entity position="28 0 -25">
-        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#B0C4DE"></a-box>
-        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="32 0 -15">
-        <a-box position="0 2.25 0" width="4.5" height="0.3" depth="2.25" color="#DDA0DD"></a-box>
-        <a-cylinder position="1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.95 1.125 -0.9" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="28 0 -27.25">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FFE66D"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#FFE66D"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="32 0 -16.5">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#95E1D3"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#95E1D3"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="35 0 -25">
-        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
-        <a-sphere position="0 1.8 0" radius="1.05" color="#00FA9A"></a-sphere>
-      </a-entity>
-
-      <a-entity position="30 3.5 -29.8">
-        <a-box width="4.5" height="3" depth="0.15" color="#8B4513"></a-box>
-        <a-box position="0 0 0.075" width="4.2" height="2.7" depth="0.075" color="#87CEEB"></a-box>
-      </a-entity>
-
-      <!-- CONFERENCE ROOM (BIGGER 1.5x) -->
-      <a-entity position="0 0 32">
-        <a-box position="0 2.25 0" width="15" height="0.375" depth="6" color="#8B4513"></a-box>
-        <a-cylinder position="6.75 1.125 2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-6.75 1.125 2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="6.75 1.125 -2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-6.75 1.125 -2.55" radius="0.18" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-6 0 32">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#1E90FF"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#1E90FF"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="6 0 32">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#1E90FF"></a-box>
-        <a-box position="0 2.1 -0.525" width="1.2" height="1.2" depth="0.225" color="#1E90FF"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-10 0 40">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.55 0" radius-bottom="1.35" radius-top="0.3" height="3.75" color="#2E8B57"></a-cone>
-      </a-entity>
-
-      <a-entity position="10 0 40">
-        <a-cylinder radius="0.75" height="1.2" color="#8B4513"></a-cylinder>
-        <a-cone position="0 2.55 0" radius-bottom="1.35" radius-top="0.3" height="3.75" color="#2E8B57"></a-cone>
-      </a-entity>
-
-      <!-- BREAK ROOMS (BIGGER 1.5x) -->
-      <a-entity position="-28 0 38">
-        <a-box position="0 2.25 0" width="3.75" height="0.3" depth="3.75" color="#FF6B9D"></a-box>
-        <a-cylinder position="1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="28 0 38">
-        <a-box position="0 2.25 0" width="3.75" height="0.3" depth="3.75" color="#7FFFD4"></a-box>
-        <a-cylinder position="1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.5 1.125 1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-        <a-cylinder position="-1.5 1.125 -1.5" radius="0.12" height="2.25" color="#654321"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-28 0 40.5">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#FFD700"></a-box>
-        <a-box position="0 2.1 0.525" width="1.2" height="1.2" depth="0.225" color="#FFD700"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="28 0 40.5">
-        <a-box position="0 1.5 0" width="1.2" height="0.225" depth="1.2" color="#BA55D3"></a-box>
-        <a-box position="0 2.1 0.525" width="1.2" height="1.2" depth="0.225" color="#BA55D3"></a-box>
-        <a-cylinder position="0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-        <a-cylinder position="-0.525 0.75 -0.525" radius="0.075" height="1.5" color="#333"></a-cylinder>
-      </a-entity>
-
-      <a-entity position="-33 0 42">
-        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
-        <a-sphere position="0 1.8 0" radius="1.05" color="#7CFC00"></a-sphere>
-      </a-entity>
-
-      <a-entity position="33 0 42">
-        <a-cylinder radius="0.6" height="0.9" color="#8B4513"></a-cylinder>
-        <a-sphere position="0 1.8 0" radius="1.05" color="#ADFF2F"></a-sphere>
-      </a-entity>
-
-      <!-- Room Labels -->
-      <a-text value="OFFICE 1" position="-30 0.01 -20" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
-      <a-text value="OFFICE 2" position="30 0.01 -20" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
-      <a-text value="CONFERENCE" position="0 0.01 35" rotation="-90 0 0" color="#FF1493" align="center" width="10"></a-text>
-      <a-text value="BREAK ROOM" position="-27 0.01 40" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
-      <a-text value="BREAK ROOM" position="27 0.01 40" rotation="-90 0 0" color="#FF1493" align="center" width="8"></a-text>
     </a-entity>
 
+    <!-- Level 1 (Janitor) Scene -->
+    <a-entity id="level1-scene" class="hidden">
+      <a-sky color="#87CEEB"></a-sky>
+      <a-light type="ambient" intensity="0.8" color="#FFF5E6"></a-light>
+      <a-light type="directional" position="15 25 10" intensity="0.5" color="#FFF8DC"></a-light>
+
+      <a-entity id="camera-rig" position="0 50 0">
+        <a-camera id="level1-camera" position="0 0 0" rotation="-90 0 0" look-controls="enabled: false" wasd-controls="enabled: false" fov="100"></a-camera>
+      </a-entity>
+
+      <a-entity id="player" position="0 0 0" player-controller>
+        <a-cylinder position="0 1.8 0" radius="0.9" height="3.6" color="#00CED1"></a-cylinder>
+        <a-sphere position="0 4.2 0" radius="1.05" color="#FFD700"></a-sphere>
+        <a-sphere position="0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
+        <a-sphere position="-0.36 4.5 0.75" radius="0.21" color="#000000"></a-sphere>
+        <a-torus position="0 3.9 0.9" radius="0.36" radius-tubular="0.06" rotation="0 0 0" color="#000000" segments-tubular="6" arc="180"></a-torus>
+        <a-cylinder position="1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
+        <a-cylinder position="-1.35 2.1 0" radius="0.24" height="2.4" color="#FFA500"></a-cylinder>
+        <a-cylinder position="0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
+        <a-cylinder position="-0.39 0.75 0" radius="0.33" height="1.5" color="#1E90FF"></a-cylinder>
+        <a-entity position="1.8 1.8 0.6" rotation="0 0 -30">
+          <a-cylinder radius="0.075" height="3.6" color="#8B4513"></a-cylinder>
+          <a-box position="0 -1.95 0" width="1.05" height="0.24" depth="0.75" color="#F0F0F0"></a-box>
+        </a-entity>
+      </a-entity>
+
+      <a-plane position="0 -0.1 0" rotation="-90 0 0" width="200" height="200" color="#2ECC71"></a-plane>
+
+      <a-entity position="-60 0 -60">
+        <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+        <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+      </a-entity>
+      <a-entity position="60 0 -60">
+        <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+        <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+      </a-entity>
+      <a-entity position="-60 0 60">
+        <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+        <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+      </a-entity>
+      <a-entity position="60 0 60">
+        <a-cylinder radius="1.5" height="8" color="#8B4513"></a-cylinder>
+        <a-cone position="0 10 0" radius-bottom="5" radius-top="0.5" height="10" color="#228B22"></a-cone>
+      </a-entity>
+
+      <a-sphere position="-55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
+      <a-sphere position="55 1 -30" radius="2" color="#3FBF3F"></a-sphere>
+      <a-sphere position="-55 1 30" radius="2" color="#3FBF3F"></a-sphere>
+      <a-sphere position="55 1 30" radius="2" color="#3FBF3F"></a-sphere>
+
+      <a-entity id="office">
+        <a-plane position="0 0 0" rotation="-90 0 0" width="80" height="100" color="#D3D3D3"></a-plane>
+
+        <a-box position="0 3 -50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
+        <a-box position="0 3 50" width="80" height="6" depth="0.5" color="#F5DEB3"></a-box>
+        <a-box position="40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
+        <a-box position="-40 3 0" width="0.5" height="6" depth="100" color="#F5DEB3"></a-box>
+
+        <a-box position="-20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
+        <a-box position="20 3 -10" width="0.4" height="6" depth="40" color="#9CAF88"></a-box>
+        <a-box position="-30 3 -30" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
+        <a-box position="-30 3 -10" width="20" height="6" depth="0.4" color="#FF7F50"></a-box>
+        <a-box position="-39.8 3 -20" width="0.4" height="6" depth="20" color="#FF7F50"></a-box>
+        <a-box position="30 3 -30" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
+        <a-box position="30 3 -10" width="20" height="6" depth="0.4" color="#E6E6FA"></a-box>
+        <a-box position="39.8 3 -20" width="0.4" height="6" depth="20" color="#E6E6FA"></a-box>
+        <a-box position="0 3 20" width="30" height="6" depth="0.4" color="#87CEEB"></a-box>
+        <a-box position="-15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
+        <a-box position="15 3 35" width="0.4" height="6" depth="30" color="#87CEEB"></a-box>
+        <a-box position="-30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
+        <a-box position="30 3 35" width="0.4" height="6" depth="30" color="#98FF98"></a-box>
+
+        <a-plane position="-30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
+        <a-plane position="30 6 -20" rotation="90 0 0" width="19" height="19" color="#FFFFFF"></a-plane>
+        <a-plane position="0 6 0" rotation="90 0 0" width="39" height="60" color="#FFFFFF"></a-plane>
+        <a-plane position="0 6 35" rotation="90 0 0" width="29" height="29" color="#FFFFFF"></a-plane>
+        <a-plane position="-27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
+        <a-plane position="27.5 6 35" rotation="90 0 0" width="24" height="29" color="#FFFFFF"></a-plane>
+      </a-entity>
+    </a-entity>
+
+    <!-- Level 2 (Software Engineer) Scene -->
+    <a-entity id="level2-scene" class="hidden">
+      <a-sky color="#0a0520"></a-sky>
+      <a-entity id="level2-camera" camera position="0 1.6 5" look-controls="enabled: false"></a-entity>
+
+      <a-light type="ambient" color="#fff" intensity="0.6"></a-light>
+      <a-light type="point" position="-5 5 2" color="#FF00FF" intensity="2"></a-light>
+      <a-light type="point" position="5 5 2" color="#00FFFF" intensity="2"></a-light>
+
+      <a-plane id="lane-guide-w" position="-1.5 3 -2" width="0.8" height="6" color="#FF00FF"
+        material="emissive: #FF00FF; emissiveIntensity: 0.2; opacity: 0.3"></a-plane>
+      <a-plane id="lane-guide-a" position="-0.5 3 -2" width="0.8" height="6" color="#00FFFF"
+        material="emissive: #00FFFF; emissiveIntensity: 0.2; opacity: 0.3"></a-plane>
+      <a-plane id="lane-guide-s" position="0.5 3 -2" width="0.8" height="6" color="#FFFF00"
+        material="emissive: #FFFF00; emissiveIntensity: 0.2; opacity: 0.3"></a-plane>
+      <a-plane id="lane-guide-d" position="1.5 3 -2" width="0.8" height="6" color="#FF6B35"
+        material="emissive: #FF6B35; emissiveIntensity: 0.2; opacity: 0.3"></a-plane>
+
+      <a-plane position="0 0.5 -1.5" width="4" height="0.3" color="#FFFFFF"
+        material="emissive: #FFFFFF; emissiveIntensity: 0.8; opacity: 0.5"></a-plane>
+
+      <a-entity id="codeBlockContainer"></a-entity>
+
+      <a-entity position="0 -0.5 0">
+        <a-box id="key-w" position="-1.5 0 0" width="0.6" height="0.1" depth="0.6" color="#FF00FF"
+          material="emissive: #FF00FF; emissiveIntensity: 0.3"></a-box>
+        <a-box id="key-a" position="-0.5 0 0" width="0.6" height="0.1" depth="0.6" color="#00FFFF"
+          material="emissive: #00FFFF; emissiveIntensity: 0.3"></a-box>
+        <a-box id="key-s" position="0.5 0 0" width="0.6" height="0.1" depth="0.6" color="#FFFF00"
+          material="emissive: #FFFF00; emissiveIntensity: 0.3"></a-box>
+        <a-box id="key-d" position="1.5 0 0" width="0.6" height="0.1" depth="0.6" color="#FF6B35"
+          material="emissive: #FF6B35; emissiveIntensity: 0.3"></a-box>
+      </a-entity>
+
+      <a-entity id="successParticles" position="0 2 0" visible="false"
+        particle-system="preset: default; color: #00FF00,#FFFF00; particleCount: 100; maxAge: 1; size: 0.3"></a-entity>
+    </a-entity>
   </a-scene>
 
   <script>
+    // ===== GLOBAL GAME STATE =====
+    let currentLevel = 'title';
+
+    // ===== LEVEL TRANSITIONS =====
+    function startLevel1() {
+      currentLevel = 'level1';
+      document.getElementById('title-ui').classList.add('hidden');
+      document.getElementById('title-scene').classList.add('hidden');
+      document.getElementById('level1-ui').classList.remove('hidden');
+      document.getElementById('level1-scene').classList.remove('hidden');
+      
+      setTimeout(() => {
+        initLevel1();
+      }, 100);
+    }
+
+    function startLevel2() {
+      currentLevel = 'level2';
+      document.getElementById('level1-ui').classList.add('hidden');
+      document.getElementById('level1-scene').classList.add('hidden');
+      document.getElementById('level2-ui').classList.remove('hidden');
+      document.getElementById('level2-scene').classList.remove('hidden');
+      
+      setTimeout(() => {
+        initLevel2();
+      }, 100);
+    }
+
+    function completeLevel2() {
+      document.getElementById('level2-complete').classList.remove('hidden');
+    }
+
+    // ===== LEVEL 1 (JANITOR) CODE =====
     const rooms = {
       hallway: { cameraX: 0, cameraZ: 0, minX: -19, maxX: 19, minZ: -40, maxZ: 18 },
       office1: { cameraX: -30, cameraZ: -20, minX: -39, maxX: -20.5, minZ: -30.5, maxZ: -9.5 },
@@ -654,7 +799,7 @@
     let currentRoom = 'hallway';
     let isTransitioning = false;
 
-    const gameState = {
+    const level1State = {
       itemsCleaned: 0,
       timeRemaining: 120,
       combo: 1,
@@ -668,21 +813,30 @@
       spillProgress: 0
     };
 
+    let level1Interval = null;
+
+    function initLevel1() {
+      level1State.started = true;
+      spawnCleanables();
+      level1Interval = setInterval(level1GameLoop, 100);
+    }
+
     AFRAME.registerComponent('player-controller', {
       init: function() {
         this.moveSpeed = 0.25;
         this.keys = {};
         
         window.addEventListener('keydown', (e) => {
+          if (currentLevel !== 'level1') return;
           this.keys[e.key.toLowerCase()] = true;
           
-          if (e.key.toLowerCase() === 'e' && gameState.started) {
-            if (gameState.nearestItem) {
-              if (gameState.nearestItem.classList.contains('trash-can')) {
-                cleanTrash(gameState.nearestItem);
-              } else if (gameState.nearestItem.classList.contains('spill')) {
-                gameState.cleaningSpill = true;
-                const progressRing = gameState.nearestItem.querySelector('#progress-ring');
+          if (e.key.toLowerCase() === 'e' && level1State.started) {
+            if (level1State.nearestItem) {
+              if (level1State.nearestItem.classList.contains('trash-can')) {
+                cleanTrash(level1State.nearestItem);
+              } else if (level1State.nearestItem.classList.contains('spill')) {
+                level1State.cleaningSpill = true;
+                const progressRing = level1State.nearestItem.querySelector('#progress-ring');
                 if (progressRing) progressRing.setAttribute('visible', 'true');
               }
             }
@@ -690,26 +844,27 @@
         });
         
         window.addEventListener('keyup', (e) => {
+          if (currentLevel !== 'level1') return;
           this.keys[e.key.toLowerCase()] = false;
           
           if (e.key.toLowerCase() === 'e') {
-            if (gameState.cleaningSpill && gameState.nearestItem) {
-              if (gameState.spillProgress < 1) {
-                const progressFill = gameState.nearestItem.querySelector('#progress-fill');
+            if (level1State.cleaningSpill && level1State.nearestItem) {
+              if (level1State.spillProgress < 1) {
+                const progressFill = level1State.nearestItem.querySelector('#progress-fill');
                 if (progressFill) progressFill.setAttribute('theta-length', '0');
-                gameState.spillProgress = 0;
+                level1State.spillProgress = 0;
               }
-              const progressRing = gameState.nearestItem.querySelector('#progress-ring');
+              const progressRing = level1State.nearestItem.querySelector('#progress-ring');
               if (progressRing) progressRing.setAttribute('visible', 'false');
             }
-            gameState.cleaningSpill = false;
+            level1State.cleaningSpill = false;
           }
         });
-
-        gameState.started = true;
       },
       
       tick: function() {
+        if (currentLevel !== 'level1' || !level1State.started) return;
+        
         const position = this.el.object3D.position;
         const rotation = this.el.object3D.rotation;
         
@@ -732,7 +887,6 @@
           if (newX > -39 && newX < 39 && newZ > -49 && newZ < 49) {
             let canMove = true;
             
-            // Wall collision
             const walls = [
               {x: -20, z: -10, width: 0.4, depth: 40},
               {x: 20, z: -10, width: 0.4, depth: 40},
@@ -775,7 +929,7 @@
         checkRoomTransition(position);
         checkNearbyItems();
         
-        if (gameState.cleaningSpill && gameState.nearestItem) {
+        if (level1State.cleaningSpill && level1State.nearestItem) {
           updateSpillCleaning();
         }
       }
@@ -825,7 +979,7 @@
       let nearest = null;
       let nearestDist = 4;
       
-      gameState.trashCans.forEach(trash => {
+      level1State.trashCans.forEach(trash => {
         const trashPos = trash.object3D.position;
         const dist = playerPos.distanceTo(trashPos);
         if (dist < nearestDist) {
@@ -834,7 +988,7 @@
         }
       });
       
-      gameState.spills.forEach(spill => {
+      level1State.spills.forEach(spill => {
         const spillPos = spill.object3D.position;
         const dist = playerPos.distanceTo(spillPos);
         if (dist < nearestDist) {
@@ -843,7 +997,7 @@
         }
       });
       
-      gameState.nearestItem = nearest;
+      level1State.nearestItem = nearest;
       
       const prompt = document.getElementById('action-prompt');
       if (nearest) {
@@ -854,59 +1008,57 @@
     }
 
     function updateSpillCleaning() {
-      gameState.spillProgress += 0.02;
+      level1State.spillProgress += 0.02;
       
-      const progressFill = gameState.nearestItem.querySelector('#progress-fill');
+      const progressFill = level1State.nearestItem.querySelector('#progress-fill');
       if (progressFill) {
-        const angle = gameState.spillProgress * 360;
+        const angle = level1State.spillProgress * 360;
         progressFill.setAttribute('theta-length', Math.min(angle, 360));
       }
       
-      if (gameState.spillProgress >= 1) {
-        cleanSpill(gameState.nearestItem);
-        gameState.cleaningSpill = false;
-        gameState.spillProgress = 0;
+      if (level1State.spillProgress >= 1) {
+        cleanSpill(level1State.nearestItem);
+        level1State.cleaningSpill = false;
+        level1State.spillProgress = 0;
       }
     }
 
     function cleanTrash(trashCan) {
       trashCan.parentNode.removeChild(trashCan);
-      const index = gameState.trashCans.indexOf(trashCan);
-      if (index > -1) gameState.trashCans.splice(index, 1);
+      const index = level1State.trashCans.indexOf(trashCan);
+      if (index > -1) level1State.trashCans.splice(index, 1);
       
-      gameState.itemsCleaned++;
+      level1State.itemsCleaned++;
       updateCombo();
-      updateUI();
-      checkWinCondition();
-      spawnParticles(trashCan.object3D.position);
+      updateLevel1UI();
+      checkLevel1WinCondition();
     }
 
     function cleanSpill(spill) {
       spill.parentNode.removeChild(spill);
-      const index = gameState.spills.indexOf(spill);
-      if (index > -1) gameState.spills.splice(index, 1);
+      const index = level1State.spills.indexOf(spill);
+      if (index > -1) level1State.spills.splice(index, 1);
       
-      gameState.itemsCleaned++;
-      gameState.nearestItem = null;
+      level1State.itemsCleaned++;
+      level1State.nearestItem = null;
       updateCombo();
-      updateUI();
-      checkWinCondition();
-      spawnParticles(spill.object3D.position);
+      updateLevel1UI();
+      checkLevel1WinCondition();
     }
 
     function updateCombo() {
-      clearTimeout(gameState.comboTimer);
-      gameState.combo++;
-      if (gameState.combo > gameState.maxCombo) {
-        gameState.maxCombo = gameState.combo;
+      clearTimeout(level1State.comboTimer);
+      level1State.combo++;
+      if (level1State.combo > level1State.maxCombo) {
+        level1State.maxCombo = level1State.combo;
       }
       
-      if (gameState.combo > 1) {
+      if (level1State.combo > 1) {
         showCombo();
       }
       
-      gameState.comboTimer = setTimeout(() => {
-        gameState.combo = 1;
+      level1State.comboTimer = setTimeout(() => {
+        level1State.combo = 1;
         document.getElementById('combo-display').classList.remove('active');
       }, 3000);
     }
@@ -914,42 +1066,13 @@
     function showCombo() {
       const comboDisplay = document.getElementById('combo-display');
       const comboText = document.getElementById('combo-text');
-      comboText.textContent = gameState.combo;
+      comboText.textContent = level1State.combo;
       comboDisplay.classList.add('active');
     }
 
-    function spawnParticles(position) {
-      const scene = document.querySelector('a-scene');
-      
-      for (let i = 0; i < 10; i++) {
-        const particle = document.createElement('a-sphere');
-        particle.setAttribute('position', `${position.x} ${position.y + 0.5} ${position.z}`);
-        particle.setAttribute('radius', '0.35');
-        particle.setAttribute('color', ['#FFD700', '#FF6B9D', '#4ECDC4', '#FFA07A'][Math.floor(Math.random() * 4)]);
-        particle.setAttribute('material', `emissive: #FFD700; emissiveIntensity: 0.8`);
-        
-        const randomX = (Math.random() - 0.5) * 5;
-        const randomY = Math.random() * 4 + 1;
-        const randomZ = (Math.random() - 0.5) * 5;
-        
-        particle.setAttribute('animation', `property: position; to: ${position.x + randomX} ${position.y + randomY} ${position.z + randomZ}; dur: 1000; easing: easeOutQuad`);
-        particle.setAttribute('animation__fade', 'property: material.opacity; to: 0; dur: 1000');
-        
-        scene.appendChild(particle);
-        
-        setTimeout(() => {
-          if (particle.parentNode) {
-            scene.removeChild(particle);
-          }
-        }, 1000);
-      }
-    }
-
     function spawnCleanables() {
-      const scene = document.querySelector('a-scene');
       const office = document.querySelector('#office');
       
-      // Trash (BIGGER 1.5x)
       const trashPositions = [
         [-12, 1.8, -15], [12, 1.8, -15], [-12, 1.8, 2], [12, 1.8, 2],
         [-28, 1.8, -22], [-32, 1.8, -18], [28, 1.8, -22], [32, 1.8, -12],
@@ -983,14 +1106,12 @@
         trashCan.appendChild(glow);
 
         office.appendChild(trashCan);
-        gameState.trashCans.push(trashCan);
+        level1State.trashCans.push(trashCan);
       });
 
-      // Spills (BIGGER 1.5x)
       const spillPositions = [
         [-8, 0.03, -20], [8, 0.03, -20], [-5, 0.03, 8], [5, 0.03, 10],
-        [-30, 0.03, -23], [30, 0.03, -17], [-5, 0.03, 32], [5, 0.03, 36],
-        [-26, 0.03, 40], [26, 0.03, 43]
+        [-30, 0.03, -23], [30, 0.03, -17], [-5, 0.03, 32], [5, 0.03, 36]
       ];
 
       spillPositions.forEach((pos) => {
@@ -1043,16 +1164,16 @@
         spill.appendChild(indicator);
 
         office.appendChild(spill);
-        gameState.spills.push(spill);
+        level1State.spills.push(spill);
       });
     }
 
-    function updateUI() {
-      document.getElementById('items-cleaned').textContent = `${gameState.itemsCleaned}/20`;
-      document.getElementById('time-display').textContent = `${Math.floor(gameState.timeRemaining)}s`;
-      document.getElementById('combo-value').textContent = `x${gameState.combo}`;
+    function updateLevel1UI() {
+      document.getElementById('items-cleaned').textContent = `${level1State.itemsCleaned}/20`;
+      document.getElementById('time-display').textContent = `${Math.floor(level1State.timeRemaining)}s`;
+      document.getElementById('combo-value').textContent = `x${level1State.combo}`;
       
-      const percentage = (gameState.timeRemaining / 120) * 100;
+      const percentage = (level1State.timeRemaining / 120) * 100;
       document.getElementById('timer-fill').style.width = percentage + '%';
       
       if (percentage < 25) {
@@ -1060,41 +1181,318 @@
       }
     }
 
-    function checkWinCondition() {
-      if (gameState.itemsCleaned >= 20) {
-        winLevel();
+    function checkLevel1WinCondition() {
+      if (level1State.itemsCleaned >= 20) {
+        winLevel1();
       }
     }
 
-    function winLevel() {
-      gameState.started = false;
-      document.getElementById('final-items').textContent = gameState.itemsCleaned;
-      document.getElementById('final-time').textContent = Math.floor(gameState.timeRemaining);
-      document.getElementById('final-combo').textContent = gameState.maxCombo;
+    function winLevel1() {
+      level1State.started = false;
+      clearInterval(level1Interval);
+      
+      document.getElementById('final-items').textContent = level1State.itemsCleaned;
+      document.getElementById('final-time').textContent = Math.floor(level1State.timeRemaining);
+      document.getElementById('final-combo').textContent = level1State.maxCombo;
       document.getElementById('level-complete').classList.add('active');
+      
+      setTimeout(() => {
+        startLevel2();
+      }, 3000);
     }
 
-    function gameLoop() {
-      if (gameState.started && gameState.timeRemaining > 0) {
-        gameState.timeRemaining -= 0.1;
+    function level1GameLoop() {
+      if (level1State.started && level1State.timeRemaining > 0) {
+        level1State.timeRemaining -= 0.1;
         
-        if (gameState.timeRemaining <= 0) {
-          gameState.timeRemaining = 0;
-          gameState.started = false;
+        if (level1State.timeRemaining <= 0) {
+          level1State.timeRemaining = 0;
+          level1State.started = false;
         }
         
-        updateUI();
+        updateLevel1UI();
       }
-      
-      setTimeout(gameLoop, 100);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // ===== LEVEL 2 (SOFTWARE ENGINEER) CODE =====
+    const level2State = {
+      isPlaying: false,
+      bugsFixed: 0,
+      totalAttempts: 0,
+      streak: 0,
+      maxStreak: 0,
+      multiplier: 1,
+      codeBlocks: [],
+      spawnRate: 1500,
+      fallSpeed: 0.02,
+      timeSlowed: false,
+      bossMode: false,
+      bossSequence: [],
+      bossIndex: 0,
+      startTime: null,
+      gameTimer: 0
+    };
+
+    const lanes = ['w', 'a', 's', 'd'];
+    const lanePositions = { w: -1.5, a: -0.5, s: 0.5, d: 1.5 };
+    const laneColors = { w: '#FF00FF', a: '#00FFFF', s: '#FFFF00', d: '#FF6B35' };
+
+    let spawnInterval;
+    let gameInterval;
+    let timerInterval;
+
+    function initLevel2() {
+      level2State.isPlaying = true;
+      level2State.startTime = Date.now();
+
+      spawnInterval = setInterval(spawnCodeBlock, level2State.spawnRate);
+      gameInterval = setInterval(updateLevel2Game, 16);
+      timerInterval = setInterval(updateLevel2Timer, 1000);
+
+      document.addEventListener('keydown', handleLevel2KeyPress);
+    }
+
+    function spawnCodeBlock() {
+      if (!level2State.isPlaying || currentLevel !== 'level2') return;
+
+      if (level2State.bugsFixed >= 45 && !level2State.bossMode) {
+        startBossFight();
+        return;
+      }
+
+      const isCoffee = Math.random() < 0.1;
+      const lane = lanes[Math.floor(Math.random() * lanes.length)];
+      const color = isCoffee ? '#8B4513' : laneColors[lane];
+
+      const container = document.getElementById('codeBlockContainer');
+      const block = document.createElement('a-entity');
+
+      const box = document.createElement('a-box');
+      box.setAttribute('width', '0.7');
+      box.setAttribute('height', '0.7');
+      box.setAttribute('depth', '0.7');
+      box.setAttribute('color', color);
+      box.setAttribute('material', `emissive: ${color}; emissiveIntensity: 0.5`);
+      box.setAttribute('rotation', '45 45 0');
+      box.setAttribute('animation', 'property: rotation; to: 405 405 360; loop: true; dur: 2000');
+
+      const text = document.createElement('a-text');
+      text.setAttribute('value', isCoffee ? '☕' : '🐛');
+      text.setAttribute('align', 'center');
+      text.setAttribute('width', '3');
+      text.setAttribute('position', '0 0 0.4');
+      text.setAttribute('color', '#FFFFFF');
+
+      block.appendChild(box);
+      block.appendChild(text);
+
+      block.setAttribute('position', `${lanePositions[lane]} 6 -1.5`);
+      container.appendChild(block);
+
+      level2State.codeBlocks.push({
+        element: block,
+        lane: lane,
+        y: 6,
+        isCoffee: isCoffee,
+        active: true
+      });
+    }
+
+    function startBossFight() {
+      level2State.bossMode = true;
+      clearInterval(spawnInterval);
+
+      const warning = document.getElementById('bossWarning');
+      warning.classList.remove('hidden');
+
       setTimeout(() => {
-        spawnCleanables();
-        gameLoop();
-      }, 1000);
-    });
+        warning.classList.add('hidden');
+
+        level2State.bossSequence = [];
+        for (let i = 0; i < 8; i++) {
+          level2State.bossSequence.push(lanes[Math.floor(Math.random() * lanes.length)]);
+        }
+        level2State.bossIndex = 0;
+
+        spawnBossSequence();
+      }, 2000);
+    }
+
+    function spawnBossSequence() {
+      let delay = 0;
+      level2State.bossSequence.forEach((lane, index) => {
+        setTimeout(() => {
+          const container = document.getElementById('codeBlockContainer');
+          const block = document.createElement('a-entity');
+
+          const box = document.createElement('a-box');
+          box.setAttribute('width', '0.9');
+          box.setAttribute('height', '0.9');
+          box.setAttribute('depth', '0.9');
+          box.setAttribute('color', '#FF0000');
+          box.setAttribute('material', 'emissive: #FF0000; emissiveIntensity: 0.8');
+          box.setAttribute('rotation', '45 45 0');
+          box.setAttribute('animation', 'property: rotation; to: 405 405 360; loop: true; dur: 1500');
+
+          const text = document.createElement('a-text');
+          text.setAttribute('value', '💀');
+          text.setAttribute('align', 'center');
+          text.setAttribute('width', '4');
+          text.setAttribute('position', '0 0 0.5');
+          text.setAttribute('color', '#FFFFFF');
+
+          block.appendChild(box);
+          block.appendChild(text);
+          block.setAttribute('position', `${lanePositions[lane]} 6 -1.5`);
+          container.appendChild(block);
+
+          level2State.codeBlocks.push({
+            element: block,
+            lane: lane,
+            y: 6,
+            isCoffee: false,
+            isBoss: true,
+            bossIndex: index,
+            active: true
+          });
+        }, delay);
+        delay += 800;
+      });
+    }
+
+    function updateLevel2Game() {
+      if (!level2State.isPlaying || currentLevel !== 'level2') return;
+
+      const speed = level2State.timeSlowed ? level2State.fallSpeed * 0.5 : level2State.fallSpeed;
+
+      for (let i = level2State.codeBlocks.length - 1; i >= 0; i--) {
+        const block = level2State.codeBlocks[i];
+        if (!block.active) continue;
+
+        block.y -= speed;
+        block.element.setAttribute('position', `${lanePositions[block.lane]} ${block.y} -1.5`);
+
+        if (block.y < -1) {
+          if (!block.isCoffee && block.active) {
+            level2State.totalAttempts++;
+            level2State.streak = 0;
+            updateMultiplier();
+          }
+          block.element.parentNode.removeChild(block.element);
+          level2State.codeBlocks.splice(i, 1);
+        }
+      }
+
+      updateLevel2UI();
+    }
+
+    function updateLevel2Timer() {
+      if (!level2State.isPlaying || currentLevel !== 'level2') return;
+      level2State.gameTimer = Math.floor((Date.now() - level2State.startTime) / 1000);
+      document.getElementById('timer').textContent = level2State.gameTimer + 's';
+    }
+
+    function handleLevel2KeyPress(e) {
+      if (!level2State.isPlaying || currentLevel !== 'level2') return;
+
+      const key = e.key.toLowerCase();
+      if (!lanes.includes(key)) return;
+
+      const laneEl = document.getElementById('lane-' + key);
+      const keyEl = document.getElementById('key-' + key);
+      laneEl.classList.add('active');
+
+      setTimeout(() => laneEl.classList.remove('active'), 200);
+
+      let hitSomething = false;
+      for (let block of level2State.codeBlocks) {
+        if (!block.active || block.lane !== key) continue;
+
+        if (block.y >= 0.3 && block.y <= 0.7) {
+          hitSomething = true;
+          block.active = false;
+
+          if (block.isCoffee) {
+            level2State.timeSlowed = true;
+            setTimeout(() => { level2State.timeSlowed = false; }, 3000);
+          } else if (block.isBoss) {
+            if (block.bossIndex === level2State.bossIndex) {
+              level2State.bossIndex++;
+              level2State.bugsFixed++;
+              level2State.totalAttempts++;
+              level2State.streak++;
+              updateMultiplier();
+
+              if (level2State.bossIndex >= level2State.bossSequence.length) {
+                endLevel2(true);
+              }
+            } else {
+              level2State.totalAttempts++;
+              level2State.streak = 0;
+              updateMultiplier();
+            }
+          } else {
+            level2State.bugsFixed++;
+            level2State.totalAttempts++;
+            level2State.streak++;
+            if (level2State.streak > level2State.maxStreak) level2State.maxStreak = level2State.streak;
+            updateMultiplier();
+          }
+
+          block.element.parentNode.removeChild(block.element);
+          break;
+        }
+      }
+
+      if (!hitSomething && !level2State.bossMode) {
+        level2State.totalAttempts++;
+        level2State.streak = 0;
+        updateMultiplier();
+      }
+    }
+
+    function updateMultiplier() {
+      if (level2State.streak >= 10) level2State.multiplier = 3;
+      else if (level2State.streak >= 5) level2State.multiplier = 2;
+      else level2State.multiplier = 1;
+
+      const multiplierEl = document.getElementById('multiplier');
+      if (level2State.multiplier > 1) {
+        multiplierEl.textContent = `${level2State.multiplier}x MULTIPLIER!`;
+        multiplierEl.classList.remove('hidden');
+      } else {
+        multiplierEl.classList.add('hidden');
+      }
+    }
+
+    function updateLevel2UI() {
+      document.getElementById('bugsFixed').textContent = `${level2State.bugsFixed} / 50`;
+      const accuracy = level2State.totalAttempts > 0 ? Math.round((level2State.bugsFixed / level2State.totalAttempts) * 100) : 100;
+      document.getElementById('accuracy').textContent = accuracy + '%';
+      document.getElementById('streak').textContent = level2State.streak;
+
+      if (level2State.bugsFixed >= 50 && !level2State.bossMode) {
+        startBossFight();
+      }
+    }
+
+    function endLevel2(won) {
+      level2State.isPlaying = false;
+      clearInterval(spawnInterval);
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+
+      const accuracy = Math.round((level2State.bugsFixed / level2State.totalAttempts) * 100);
+
+      document.getElementById('level2-final-stats').innerHTML = `
+        Bugs Fixed: ${level2State.bugsFixed}<br>
+        Accuracy: ${accuracy}%<br>
+        Max Streak: ${level2State.maxStreak}<br>
+        Time: ${level2State.gameTimer}s
+      `;
+
+      completeLevel2();
+    }
   </script>
 </body>
 </html>
